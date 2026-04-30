@@ -163,6 +163,23 @@ export async function email(message, env, ctx) {
 			}));
 
 		}
+		if (env.hook) {
+			try {
+				const response = await fetch(env.hook, {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify(emailRow)
+				});
+
+				if (!response.ok) {
+					throw new Error(`Forward to internal API hook failed with status ${response.status}`);
+				}
+			} catch (e) {
+				console.error('Forward to internal API hook failed: ', e);
+			}
+		}
 
 	} catch (e) {
 		console.error('邮件接收异常: ', e);
